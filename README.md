@@ -50,6 +50,7 @@ None of this is exaggerated for effect — it's a faithful composite of patterns
 
 ## 🏗️ What This Project Demonstrates
 
+
 | Skill Area | Applied |
 |---|---|
 | **Dimensional Modeling** | Star schema design, grain analysis, snowflake-vs-star trade-offs, junk dimensions, factless facts, accumulating snapshot facts, role-playing dimensions |
@@ -58,6 +59,20 @@ None of this is exaggerated for effect — it's a faithful composite of patterns
 | **DAX** | `CALENDARAUTO()`, `DISTINCTCOUNT` vs `COUNTROWS` grain-awareness, `DATEDIFF`, `LOOKUPVALUE`, `USERPRINCIPALNAME()`, `USERELATIONSHIP` |
 | **Security** | Region-based Row-Level Security, tested via user impersonation (`View As`) |
 | **Governance & Standards** | Naming conventions, surrogate key discipline, a single centralized measures table, documented technical debt |
+
+--- 
+
+## 📈 Project Outcomes
+
+| Metric | Before | After |
+|---------|---------|--------|
+| Tables in model | 23 | 13 |
+| Fact tables | Mixed operational tables | 6 purpose-built facts |
+| Dimension tables | None | 4 conformed dimensions |
+| Relationships | Many-to-many | One-to-many |
+| Security | None | Region-based RLS |
+| Measures | Scattered | Centralized |
+| Date handling | Inconsistent | Shared CALENDARAUTO() dimension |
 
 ---
 
@@ -107,7 +122,11 @@ DD --> FC
 DD --> FI
 DD --> FT
 ```
-![After](docs/images/after-model(2).png)
+<p align="center">
+  <a href="docs/images/after-model(2).png">
+    <img src="docs/images/after-model(2).png" alt="Final Star Schema" width="800">
+  </a>
+</p>
 
 <details>
 <summary><strong>📐 Click to see the modeling patterns used</strong></summary>
@@ -127,15 +146,18 @@ DD --> FT
 
 ## 🗂️ Repository Structure
 
-```
-├── README.md                    → you are here
-├── Elaborated_walkthrough.md    → full step-by-step build narrative, decisions & debugging
-├── data_remodel_project.pbix    → the Power BI file itself
-├── docs/
-│   └── images/                  → model screenshots, before/after visuals
-|   └── phases/
-|   └── rules & standards/                
-└── dataset                      → source data used for the build
+```text
+.
+├── README.md
+├── Elaborated_walkthrough.md      → Complete build narrative, design decisions, and debugging journey
+├── data_remodel_project.pbix      → Final Power BI semantic model
+├── dataset/                       → Source data used for the project
+└── docs/
+    ├── images/                    → Before/after model screenshots
+    ├── phases/                    → Phase-wise transformation visuals
+    ├── facts/                     → Fact table illustrations
+    ├── rules & standards/         → Modeling rules and naming standards
+    └── plan.png                   → Overall project roadmap
 ```
 
 <!-- Adjust this tree to match your actual repo layout -->
@@ -144,14 +166,16 @@ DD --> FT
 
 ## 🛠️ How the Model Was Built — Highlights
 
-A few of the moments that made this more than a routine "connect the tables" exercise:
+Some of the key modeling decisions and debugging moments that shaped the final semantic model:
 
-- 🔍 **A live fan-out bug, caught in the act.** Merging products by name unexpectedly inflated total sales. Root cause: two duplicate rows for the same product in the source dimension, with different completeness. Diagnosed via grouping/counting, fixed upstream, and re-verified against a protected sentinel measure — not patched over, actually resolved. *(Full story in the walkthrough.)*
-- 🧠 **A header/detail decision that avoided a classic trap.** Rather than building separate fact tables for order headers and order line items (and connecting them fact-to-fact — a common but serious anti-pattern), the fact table was built from the true transaction grain, with the header used only to supply dimensional context.
-- ⏱️ **An accumulating snapshot instead of five redundant fact tables.** Recognized that Orders → Shipping → Delivery → Invoicing → Payment all repeat the *same* revenue figure, and that the real analytical value was in the *timing* between stages — not five copies of the same number.
-- 🔐 **Row-Level Security, actually tested.** Region-based RLS wasn't just wired up — it was validated by impersonating a real user identity and confirming totals shrank correctly, then reverted to confirm the unrestricted view still worked.
+| Challenge | Solution | Why it Matters |
+|-----------|----------|----------------|
+| 🔍 **Fan-out bug during product merge** | Detected an unexpected increase in total sales after merging products. Traced the issue to duplicate product records, fixed the duplicates upstream, and validated the correction using a protected sentinel measure. | Demonstrates a real-world debugging workflow and the importance of validating business metrics after every structural change. |
+| 🧠 **Header vs. Detail modeling** | Built `fact_sales` from the line-item (detail) table while using order headers only as descriptive context. | Preserves the correct transaction grain and avoids the common fact-to-fact relationship anti-pattern. |
+| ⏱️ **Accumulating Snapshot Fact** | Modeled the entire Order → Shipment → Delivery → Invoice → Payment lifecycle as a single accumulating snapshot instead of multiple event fact tables. | Eliminates redundant transactional data while enabling process-duration analysis across the fulfillment lifecycle. |
+| 🔐 **Row-Level Security (RLS)** | Implemented region-based security using `USERPRINCIPALNAME()` and validated it through Power BI's **View As** feature. | Ensures users see only authorized data while confirming the security model behaves correctly in both restricted and unrestricted scenarios. |
 
-👉 Every one of these is broken down in full — including the DAX, the Power Query steps, and the reasoning behind each trade-off — in **[`Elaborated_walkthrough.md`](./Elaborated_walkthrough.md)**.
+> 📖 Each of these topics—including the Power Query transformations, DAX logic, validation strategy, and design trade-offs—is documented in detail in **[`Elaborated_walkthrough.md`](./Elaborated_walkthrough.md)**.
 
 ---
 
@@ -177,7 +201,7 @@ A few of the moments that made this more than a routine "connect the tables" exe
 
 ## Acknowledgments
 
-This project was built as a hands-on exercise following a comprehensive Power BI data modeling walkthrough, then implemented, tested, and documented independently as a portfolio piece.
+This project was built as a practical exercise to apply dimensional modeling concepts in Power BI. The implementation, debugging process, design decisions, documentation, and final semantic model were completed independently as a portfolio project.
 
 ---
 
