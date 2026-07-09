@@ -9,7 +9,7 @@ This document is the companion to my main `README.md`. Where the README tells yo
 ## Table of Contents
 
 1. [The Setup: A Deliberately Broken Data Model](#1-the-setup-a-deliberately-broken-data-model)
-2. [The Five Ground Rules](#2-the-five-ground-rules)
+2. [The Ground Rules](#2-the-ground-rules)
 3. [Phase 1 — Reconnaissance: Reading the Chaos](#3-phase-1--reconnaissance-reading-the-chaos)
 4. [Workspace Strategy: Organizing Power Query Before Touching Anything](#4-workspace-strategy-organizing-power-query-before-touching-anything)
 5. [Phase 2 — Building the Dimensions](#5-phase-2--building-the-dimensions)
@@ -32,8 +32,11 @@ This project started from a dataset engineered to reproduce that exact pain: **2
 The goal wasn't to build a dashboard. It was to take that spider-web of tables and turn it into a **healthy, testable, secure star schema** — using the exact same discipline you'd want to see in a professional BI engagement.
 
 ---
+## 1.2 The plan
+![Plan](docs/plan.png)
+---
 
-## 2. The Five Ground Rules
+## 2. The Ground Rules
 
 Before a single table was touched, five standards were locked in. These weren't just style preferences — they were the constitution the entire rebuild had to obey, from the first dimension to the last measure.
 
@@ -45,7 +48,26 @@ Before a single table was touched, five standards were locked in. These weren't 
 | 4 | **Protect the numbers.** Know your key totals by heart; re-check them after every structural change. | A model can *look* correct and still silently duplicate or drop rows. Trust nothing — verify. |
 | 5 | **Define standards up front, and follow them until the end.** | English only. `snake_case` for every table/column. Prefixes: `dim_` for dimensions, `fact_` for facts. Surrogate keys always end in `_key` (to distinguish them from natural/source IDs like `_id`). All table, column, and value names must be human-friendly — no raw technical labels from the source system. |
 
+Rules:
+![Rules](docs/rules%20%26%20standards/rules.png)
+
+Standard:
+![Standard](docs/rules%20%26%20standards/standard.png)
+
 These five rules were re-applied, quite literally, at every single step from here on.
+
+---
+## Phase Plan
+<table>
+  <tr>
+    <td><img src="docs/phases/Screenshot%202026-07-09%20111430.png" width="100%"></td>
+    <td><img src="docs/phases/Screenshot%202026-07-09%20111438.png" width="100%"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/phases/Screenshot%202026-07-09%20111450.png" width="100%"></td>
+    <td><img src="docs/phases/Screenshot%202026-07-09%20111503.png" width="100%"></td>
+  </tr>
+</table>
 
 ---
 
