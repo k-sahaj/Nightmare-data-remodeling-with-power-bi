@@ -1,4 +1,4 @@
-# 🌌 From Nightmare Dataset to Galaxy Schema
+# 🌌 Rebuilding a Broken Power BI Model into a Production-Ready Star Schema
 ### A Power BI Data Modeling Deep-Dive
 
 ![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
@@ -15,11 +15,10 @@
 ## 📸 Preview
 
 <!-- Replace with your actual screenshots -->
-| Before: The Chaos | After: The Star Schema |
+| Before: The Chaos | After: The Star Schema (Galaxy) |
 |:---:|:---:|
 | ![Before](docs/images/before-model.png) | ![After](docs/images/after-model.png) |
 
-*(Add your Model View screenshots to `docs/images/` and update the paths above.)*
 
 ---
 
@@ -68,38 +67,47 @@ Six purpose-built fact tables, each connected only through shared dimensions —
 
 ```mermaid
 flowchart TB
-    subgraph Facts["⭐ Fact Tables"]
-        FS["fact_sales<br/><i>core transactions</i>"]
-        FI["fact_inventory<br/><i>monthly stock</i>"]
-        FC["fact_campaign_spend<br/><i>daily marketing spend</i>"]
-        FP["fact_promotion_coverage<br/><i>factless bridge</i>"]
-        FO["fact_order_fulfillment<br/><i>accumulating snapshot</i>"]
+    subgraph Facts["Fact Tables"]
         FT["fact_sales_targets<br/><i>planned revenue</i>"]
+        FO["fact_order_process<br/><i>accumulating snapshot fact</i>"]
+        FS["fact_sales<br/><i>core transactions</i>"]
+        FP["fact_promotion_coverage<br/><i>factless bridge</i>"]
+        FC["fact_campaign_spend<br/><i>daily marketing spend</i>"]
+        FI["fact_inventory<br/><i>monthly stock</i>"]
     end
-    subgraph Dims["🧭 Dimensions"]
+
+    subgraph Dims["Dimensions"]
+        DD["dim_date<br/><i>CALENDARAUTO()</i>"]
         DC["dim_customer"]
+        DF["dim_order_flags<br/><i>junk dimension</i>"]
         DP["dim_product"]
         DG["dim_geo"]
         DCa["dim_campaign"]
-        DF["dim_order_flags<br/><i>junk dimension</i>"]
-        DD["dim_date<br/><i>CALENDARAUTO()</i>"]
     end
+    MES["_measures"]
     SEC["security table"] -.RLS.-> DC
+    
+DC --> FS
+DC --> FO
 
-    DC --> FS
-    DC --> FO
-    DP --> FS
-    DP --> FI
-    DP --> FP
-    DG --> FS
-    DF --> FS
-    DCa --> FC
-    DCa --> FP
-    DD --> FS
-    DD --> FI
-    DD --> FC
-    DD --> FT
+DP --> FS
+DP --> FP
+DP --> FI
+
+DG --> FS
+
+DF --> FS
+
+DCa --> FC
+DCa --> FP
+
+DD --> FS
+DD --> FO
+DD --> FC
+DD --> FI
+DD --> FT
 ```
+![After](docs/images/after-model(2).png)
 
 <details>
 <summary><strong>📐 Click to see the modeling patterns used</strong></summary>
@@ -122,10 +130,12 @@ flowchart TB
 ```
 ├── README.md                    → you are here
 ├── Elaborated_walkthrough.md    → full step-by-step build narrative, decisions & debugging
-├── <project>.pbix                → the Power BI file itself
+├── data_remodel_project.pbix    → the Power BI file itself
 ├── docs/
 │   └── images/                  → model screenshots, before/after visuals
-└── data/                        → (if applicable) source data used for the build
+|   └── phases/
+|   └── rules & standards/                
+└── dataset                      → source data used for the build
 ```
 
 <!-- Adjust this tree to match your actual repo layout -->
@@ -145,7 +155,7 @@ A few of the moments that made this more than a routine "connect the tables" exe
 
 ---
 
-## ✅ Ground Rules Followed Throughout
+## Ground Rules Followed Throughout
 
 1. **Star schema only** — facts never connect directly to other facts
 2. **Know the grain before touching a table** — every merge was grain-checked first
@@ -155,7 +165,7 @@ A few of the moments that made this more than a routine "connect the tables" exe
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1. Clone this repository
 2. Open `<project>.pbix` in Power BI Desktop
@@ -165,29 +175,14 @@ A few of the moments that made this more than a routine "connect the tables" exe
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 This project was built as a hands-on exercise following a comprehensive Power BI data modeling walkthrough, then implemented, tested, and documented independently as a portfolio piece.
 
-<!-- Optionally credit the original course/video here, e.g.:
-Inspired by [Creator Name]'s Power BI data modeling tutorial — this repo is my own independent implementation and write-up.
--->
-
 ---
 
-## 📬 Connect
+## Author
 
-If you're reviewing this as part of a hiring process or just want to talk data modeling, I'd love to hear from you.
-
-<!-- Add your links -->
-- LinkedIn: [your-linkedin]
-- Portfolio: [your-portfolio]
-- Email: [your-email]
-
----
-
-<div align="center">
-
-*⭐ If this project was useful or interesting, consider starring the repo!*
+Sahaj K.
 
 </div>
